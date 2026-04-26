@@ -1,0 +1,16 @@
+coins:
+  limit: 20          # Top N coins by market cap
+  vs_currency: usd
+  ids: []            # Pin specific coin IDs to override top-N (e.g. [bitcoin, ethereum])
+
+binance:
+  pairs:
+    - BTCUSDT
+    - ETHUSDT
+    - SOLUSDT
+  flush_interval_seconds: 300   # Flush buffer to S3 every 5 minutes
+
+schedules:
+  ingest_daily:   "0 1 * * *"    # 01:00 UTC
+  ingest_binance: "*/15 * * * *" # Every 15 minutes
+  run_dbt:        "0 3 * * *"    # 03:00 UTC
