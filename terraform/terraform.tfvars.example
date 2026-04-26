@@ -1,0 +1,16 @@
+# Copy this file to terraform.tfvars and fill in your values.
+# terraform.tfvars is in .gitignore — never commit it.
+
+aws_region = "us-east-1"
+project    = "crypto-pipeline"
+
+# Redshift admin credentials
+redshift_admin_user     = "admin"
+redshift_admin_password = "ChangeMe123!"   # min 8 chars, must include uppercase + number
+
+# Your public IP — find it at https://checkip.amazonaws.com
+# Must be in CIDR notation: e.g. 203.0.113.42/32
+my_ip = "YOUR_PUBLIC_IP/32"
+
+# Name of an EC2 Key Pair you created in the AWS console (EC2 → Key Pairs)
+ec2_key_pair_name = "my-key-pair"
