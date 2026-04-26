@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    description: "Raw tables loaded directly from S3 via Redshift COPY — no transformation applied."
+    tables:
+      - name: coingecko_markets
+        description: "Daily top-N coin market data from CoinGecko REST API."
+      - name: fear_greed_index
+        description: "Daily Fear & Greed sentiment score from Alternative.me."
+      - name: binance_trades
+        description: "Individual trade ticks from Binance WebSocket stream."

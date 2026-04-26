@@ -1,0 +1,44 @@
+version: 2
+
+models:
+  - name: stg_coingecko__markets
+    description: "Cleaned daily market data per coin — one row per coin per day."
+    columns:
+      - name: coin_id
+        description: "CoinGecko coin identifier (e.g. bitcoin, ethereum)."
+        tests: [not_null]
+      - name: symbol
+        description: "Ticker symbol uppercased (e.g. BTC, ETH)."
+        tests: [not_null]
+      - name: market_date
+        description: "Date this snapshot was taken."
+        tests: [not_null]
+      - name: current_price_usd
+        tests: [not_null]
+      - name: market_cap_usd
+        tests: [not_null]
+
+  - name: stg_fear_greed__index
+    description: "Daily Fear & Greed score — one row per day."
+    columns:
+      - name: score_date
+        tests: [not_null, unique]
+      - name: score
+        tests: [not_null]
+      - name: classification
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["Extreme Fear", "Fear", "Neutral", "Greed", "Extreme Greed"]
+
+  - name: stg_binance__trades
+    description: "Individual trade ticks from Binance WebSocket stream."
+    columns:
+      - name: trade_id
+        tests: [not_null, unique]
+      - name: symbol
+        tests: [not_null]
+      - name: price
+        tests: [not_null]
+      - name: trade_date
+        tests: [not_null]

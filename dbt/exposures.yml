@@ -1,0 +1,17 @@
+version: 2
+
+exposures:
+  - name: crypto_dashboard
+    type: dashboard
+    maturity: medium
+    description: >
+      Metabase dashboard reading from Redshift marts schema.
+      Shows price trends, volume, market cap, and Fear & Greed sentiment.
+    depends_on:
+      - ref('fact_trades')
+      - ref('dim_coin')
+      - ref('dim_date')
+      - ref('dim_sentiment')
+    owner:
+      name: Data Engineer
+      email: sjin.data@gmail.com
