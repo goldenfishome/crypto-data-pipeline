@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Lint and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Lint (flake8)
+        run: flake8 ingestion/ dags/ --max-line-length=100 --extend-ignore=E203
+
+      - name: Format check (black)
+        run: black --check ingestion/ dags/
+
+      - name: Unit tests
+        env:
+          # Tests use local file paths instead of real AWS/Redshift
+          RAW_BUCKET_NAME: ""
+          REDSHIFT_HOST: localhost
+          REDSHIFT_PORT: "5439"
+          REDSHIFT_DB: crypto_pipeline
+          REDSHIFT_USER: test
+          REDSHIFT_PASSWORD: test
+          REDSHIFT_IAM_ROLE: arn:aws:iam::123456789012:role/test
+        run: pytest tests/ -v --tb=short
+
+  dbt-compile:
+    name: dbt compile check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dbt
+        run: pip install dbt-core dbt-redshift
+
+      - name: Write profiles.yml
+        run: |
+          mkdir -p dbt
+          cat > dbt/profiles.yml <<EOF
+          crypto_pipeline:
+            target: ci
+            outputs:
+              ci:
+                type: redshift
+                host: localhost
+                port: 5439
+                dbname: crypto_pipeline
+                user: ci
+                password: ci
+                schema: staging
+                threads: 1
+          EOF
+
+      - name: dbt compile
+        working-directory: dbt
+        run: dbt compile --profiles-dir . --no-use-colors
