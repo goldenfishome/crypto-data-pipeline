@@ -33,6 +33,7 @@ default_args = {
 # Imports are inside functions so Airflow's DAG parser doesn't execute them
 # on every 30-second parse cycle.
 
+
 def _ingest_coingecko(**context) -> None:
     from datetime import date
     import os

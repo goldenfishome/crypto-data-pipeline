@@ -23,6 +23,7 @@ from callbacks import on_failure_alert
 DBT_DIR      = "/opt/airflow/dbt"
 DBT_PROFILES = "/opt/airflow/dbt"
 
+
 def _dbt(command: str) -> str:
     """Build a dbt CLI command with consistent flags."""
     return f"cd {DBT_DIR} && dbt {command} --profiles-dir {DBT_PROFILES} --no-use-colors"

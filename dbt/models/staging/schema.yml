@@ -29,7 +29,8 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ["Extreme Fear", "Fear", "Neutral", "Greed", "Extreme Greed"]
+              arguments:
+                values: ["Extreme Fear", "Fear", "Neutral", "Greed", "Extreme Greed"]
 
   - name: stg_binance__trades
     description: "Individual trade ticks from Binance WebSocket stream."

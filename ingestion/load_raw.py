@@ -23,6 +23,7 @@ def _cfg() -> tuple[str, str]:
     """Read config at call time so tests can set env vars before importing."""
     return os.environ["RAW_BUCKET_NAME"], os.environ["REDSHIFT_IAM_ROLE"]
 
+
 # ── DDL: create raw schema and tables once ────────────────────────────────────
 # Columns mirror the Parquet files written by the ingestion scripts exactly.
 
@@ -157,7 +158,8 @@ def load_binance(run_date: date, symbol: str) -> None:
         # trade_time_utc is ISO format: "2024-01-15T14:30:00+00:00" — check first 10 chars
         row = fetchone(
             conn,
-            "SELECT COUNT(1) FROM raw.binance_trades WHERE symbol = %s AND LEFT(trade_time_utc, 10) = %s",
+            "SELECT COUNT(1) FROM raw.binance_trades"
+            " WHERE symbol = %s AND LEFT(trade_time_utc, 10) = %s",
             (symbol, date_str),
         )
         if row and row[0] > 0:
@@ -174,10 +176,14 @@ def load_binance(run_date: date, symbol: str) -> None:
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="COPY raw Parquet from S3 into Redshift raw schema")
+    parser = argparse.ArgumentParser(
+        description="COPY raw Parquet from S3 into Redshift raw schema"
+    )
     parser.add_argument("--source", required=True, choices=["coingecko", "fear_greed", "binance"])
     parser.add_argument("--date", default=date.today().isoformat(), help="YYYY-MM-DD")
-    parser.add_argument("--symbol", default="BTCUSDT", help="Binance pair (only used with --source binance)")
+    parser.add_argument(
+        "--symbol", default="BTCUSDT", help="Binance pair (only used with --source binance)"
+    )
     args = parser.parse_args()
 
     run_date = date.fromisoformat(args.date)

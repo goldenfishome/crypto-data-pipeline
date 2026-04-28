@@ -42,7 +42,9 @@ def fetch_markets(coins_limit: int, vs_currency: str = "usd") -> list[dict]:
             resp = requests.get(url, params=params, timeout=30)
             if resp.status_code == 429:
                 wait = BACKOFF_BASE**attempt
-                logger.warning(f"Rate limited — retrying in {wait}s (attempt {attempt + 1}/{MAX_RETRIES})")
+                logger.warning(
+                    f"Rate limited — retrying in {wait}s (attempt {attempt + 1}/{MAX_RETRIES})"
+                )
                 time.sleep(wait)
                 continue
             resp.raise_for_status()

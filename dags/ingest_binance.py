@@ -36,7 +36,7 @@ def _check_s3_files_exist(**context) -> bool:
     ShortCircuitOperator skips all downstream tasks if this returns False.
     """
     import boto3
-    from datetime import date, timezone
+    from datetime import date
 
     bucket = os.environ["RAW_BUCKET_NAME"]
     pairs  = os.getenv("BINANCE_PAIRS", "BTCUSDT,ETHUSDT,SOLUSDT").split(",")
