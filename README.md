@@ -1,44 +1,63 @@
 # Crypto Data Pipeline
 
-End-to-end data engineering portfolio project. Ingests live cryptocurrency data from three sources, transforms it into a Kimball-style analytical model, orchestrates workflows with Airflow, and provisions all infrastructure with Terraform on AWS.
+Pulls live market data from three sources, loads it into Redshift, transforms it with dbt, and serves it through a Metabase dashboard. Runs on AWS, orchestrated by Airflow, provisioned with Terraform.
 
 ## Architecture
 
 ```
 CoinGecko API  ─┐
-Binance WS     ─┼──▶ S3 (Parquet) ──▶ Redshift raw ──▶ dbt ──▶ Redshift marts ──▶ Metabase
+Binance WS     ─┼──▶  S3 (Parquet)  ──▶  Redshift  ──▶  dbt  ──▶  Metabase
 Fear & Greed   ─┘
 
-         ↑ Airflow DAGs orchestrate all steps
-         ↑ Terraform provisions all AWS infrastructure
+Airflow schedules every step. Terraform provisions all AWS infrastructure.
 ```
 
-## Tech Stack
+**Data sources:**
+- CoinGecko REST API — daily prices and market cap for top 20 coins
+- Binance WebSocket — real-time trade stream, flushed to S3 every 5 minutes
+- Alternative.me Fear & Greed Index — daily sentiment score
 
-| Layer | Tool |
+**dbt layers:** staging (views) → intermediate (joins, VWAP, rolling averages) → marts (Kimball star schema: `fact_trades`, `dim_coin`, `dim_date`, `dim_sentiment`)
+
+## Stack
+
+| | |
 |---|---|
-| Ingestion | Python (requests, websockets, pyarrow) |
-| Storage | AWS S3 (Parquet, Hive-partitioned) |
-| Data warehouse | AWS Redshift Serverless |
-| Transformation | dbt Core (Kimball star schema) |
-| Orchestration | Apache Airflow (self-hosted on EC2) |
+| Cloud | AWS (S3, Redshift Serverless, EC2) |
+| Orchestration | Apache Airflow |
+| Transformation | dbt Core |
 | Infrastructure | Terraform |
 | Visualization | Metabase |
-| Testing | pytest, dbt tests |
 | CI/CD | GitHub Actions |
 
-## Project Structure
+## Running locally
 
-```
-├── ingestion/       # Python ingestion scripts + Redshift loader
-├── dags/            # Airflow DAGs
-├── dbt/             # dbt project (staging → intermediate → marts)
-├── terraform/       # AWS infrastructure as code
-├── tests/           # Python unit tests
-├── docker-compose.yml
-└── Makefile
+```bash
+cp .env.example .env        # fill in credentials
+docker compose up -d        # starts Airflow + Metabase
 ```
 
-## Setup
+Airflow UI at `http://localhost:8080`, Metabase at `http://localhost:3000`.
 
-See [REQUIREMENTS.md](REQUIREMENTS.md) for full specification and [DEVELOPMENT.md](DEVELOPMENT.md) for local dev commands.
+To run ingestion or dbt manually:
+```bash
+python ingestion/coingecko.py --date 2024-01-15
+cd dbt && dbt run
+```
+
+## Deploying to AWS
+
+```bash
+cd terraform
+terraform init && terraform apply
+```
+
+After apply, copy the outputs (`ec2_public_ip`, `redshift_endpoint`) into your `.env` and SSH into the instance — Docker Compose is already running via the bootstrap script.
+
+## Tests
+
+```bash
+pytest tests/        # 30 unit tests covering ingestion and Redshift loader
+```
+
+CI runs on every push via GitHub Actions (lint + tests + dbt parse).
