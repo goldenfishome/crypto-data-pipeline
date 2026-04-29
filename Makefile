@@ -2,6 +2,7 @@
         ingest-coingecko ingest-fear-greed \
         dbt-run dbt-test dbt-compile \
         test lint fmt \
+        metabase \
         tf-init tf-plan tf-apply tf-destroy
 
 # ── Local Airflow ─────────────────────────────────────────────────────────────
@@ -44,6 +45,10 @@ lint:
 
 fmt:
 	black ingestion/ dags/
+
+# ── Metabase ──────────────────────────────────────────────────────────────
+metabase:
+	open http://localhost:3000
 
 # ── Terraform ─────────────────────────────────────────────────────────────────
 tf-init:
