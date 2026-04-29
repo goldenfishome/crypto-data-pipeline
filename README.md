@@ -41,6 +41,4 @@ Fear & Greed   ─┘
 
 ## Setup
 
-See [REQUIREMENTS.md](REQUIREMENTS.md) for full specification and [CLAUDE.md](CLAUDE.md) for development commands.
-
-> Full README with architecture diagram, design decisions, and setup guide coming in the polish milestone.
+See [REQUIREMENTS.md](REQUIREMENTS.md) for full specification and [DEVELOPMENT.md](DEVELOPMENT.md) for local dev commands.

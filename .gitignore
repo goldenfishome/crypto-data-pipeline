@@ -1,5 +1,6 @@
 .venv/
 .env
+DEVELOPMENT.md
 __pycache__/
 *.pyc
 *.pyo
@@ -8,6 +9,7 @@ __pycache__/
 dbt/target/
 dbt/dbt_packages/
 dbt/logs/
+dbt/.user.yml
 terraform/.terraform/
 terraform/*.tfstate
 terraform/*.tfstate.backup
